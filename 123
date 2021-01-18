@@ -1,0 +1,95 @@
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+
+class Calculator extends JFrame{
+	
+	//선언
+	JPanel panel_a, panel_b, panel_c;
+	JLabel label1, label2;  // 디스플레이되서 이름 잘 안 지음
+	JButton but;
+	JTextField interest, rate, resuert;
+	
+	
+	Calculator() {  // gui 파트 생성자 만듬 , 배치 만들기, 선언한 컴퍼렌트 만드는 거
+		
+		but = new JButton("계산");
+		panel_a = new JPanel();
+		panel_b = new JPanel();
+		panel_c = new JPanel();
+		interest = new JTextField(10);
+		rate = new JTextField(10);
+		resuert= new JTextField(15);
+		label1 = new JLabel("원금을 입력하시오", JLabel.CENTER);
+		label2 = new JLabel("이율을 입력하시오", JLabel.CENTER);
+		
+		panel_a.add(label1);
+		panel_a.add(interest);
+		
+		panel_a.add(label2);
+		panel_a.add(rate);
+		
+		panel_b.add(but);
+		
+		panel_c.add(resuert);
+		
+		panel_a.setLayout(new GridLayout(0,2)); // 가로 2칸씩 채워지게
+		
+		but.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				if(but.getText()=="계산") {
+					//String a = interest.getText();
+					//String b = rate.getText();
+					//int a_a = Integer.parseInt(a);
+					//Float b_b = Float.parseFloat(b);
+					
+					int in = Integer.parseInt(interest.getText());  //  텍스트 필드에 interest의 입력한 값을 가져오고 String형을 integer형으로 변환해서  in 저장함
+					Float ra = Float.parseFloat(rate.getText());
+					int as = (int)((ra/100)*in);
+					resuert.setText("이자는 "+as+ "만원 입니다."); 
+				}
+						
+			}	
+		});
+		
+		this.add("North",panel_a);
+		this.add("Center",panel_b);
+		this.add("South",panel_c);
+	
+
+		this.setTitle("이자 계산기");
+		this.setSize(300,300);
+		this.getDefaultCloseOperation();
+		this.setVisible(true);
+	}
+	
+	
+	
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		new Calculator();
+	}
+}
+
+
+
+/*
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+}*/
+
+
+	
