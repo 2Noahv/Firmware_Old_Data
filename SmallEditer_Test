@@ -1,0 +1,86 @@
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+
+public class SmallEditer extends JFrame {
+
+	JPanel maue, adit;
+	JButton editbut,pastebut,cutbut,copybut,exebut;
+	JTextArea editter;
+	
+	SmallEditer() {
+		
+		maue = new JPanel();
+		adit = new JPanel();
+		editbut = new JButton("편집");
+		pastebut = new JButton("붙이기");
+		cutbut = new JButton("잘라내기");
+		copybut  = new JButton("복사");
+		exebut = new JButton("종료");
+		
+		editter = new JTextArea();
+		
+		editter.setSelectionColor(Color.YELLOW);	// 마우스로 드래그(선택한)부분 바탕색 노랑
+		editter.setSelectedTextColor(Color.red);	// 마우스로 드래그(선택한)부분 글자색 빨강
+		
+		maue.setLayout(new FlowLayout());
+		maue.add(editbut);
+		maue.add(copybut);
+		maue.add(cutbut);
+		maue.add(pastebut);
+		maue.add(exebut);
+		
+		
+		this.add("North",maue);
+		this.add("Center",editter);
+		
+		this.getDefaultCloseOperation();
+		this.setTitle("편집기");
+		this.setSize(400, 200);
+		this.setVisible(true);
+		
+
+	editbut.addActionListener(new MyListner());
+	copybut.addActionListener(new MyListner());
+	cutbut.addActionListener(new MyListner());
+	pastebut.addActionListener(new MyListner());
+	exebut.addActionListener(new MyListner());
+}
+	 class MyListner implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JButton btn = (JButton)e.getSource();
+			if(btn==editbut) {
+				editter.setEditable(true);
+				editbut.setBackground(Color.CYAN);
+				editter.requestFocus();
+			}
+			if(btn==copybut)
+				editter.copy();
+			if(btn==cutbut)
+				editter.cut();
+			if(btn==pastebut)
+				editter.paste();
+			if(btn==exebut)
+				System.exit(0);
+		}
+		 
+	 }
+	
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		new SmallEditer();
+	}
+}
