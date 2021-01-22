@@ -1,0 +1,78 @@
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+
+
+class OrderText extends JFrame{	
+	
+	JPanel TopPanel, panel1, buttonPanel;
+	JLabel label, label1;
+	JCheckBox onion, cheese, tomato;
+	JButton buttonOK;
+	
+	
+	//생성자
+	public OrderText() {
+	
+	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	setTitle("체크박스 테스트");
+	setSize(270, 200);
+	setVisible(true);
+		
+	//레이블 생성 패널 추가
+	TopPanel = new JPanel();
+	label = new JLabel("햄버거에 무엇을 추가하시겠습니까?");
+	TopPanel.add(label);
+	add(TopPanel, BorderLayout.NORTH);  // 패널 위치 위
+	
+	// 체크 박스 생성 패널 추가
+	panel1 = new JPanel();
+	onion = new JCheckBox("양파");
+	panel1.add(onion);
+	cheese = new JCheckBox("치즈");
+	panel1.add(cheese);
+	tomato = new JCheckBox("토마토");
+	panel1.add(tomato);
+	
+	
+
+	label1 = new JLabel("선택한 옵션은 다음과 같아용!!");
+	panel1.add(label1);
+	
+	add(panel1, BorderLayout.CENTER);  // 패널 위치 가운데
+	
+	
+	// 버튼 생성 및 패널 추가
+	buttonPanel = new JPanel();
+	buttonOK = new JButton("OK");
+	buttonPanel.add(buttonOK);
+	
+	add(buttonPanel, BorderLayout.SOUTH); //패널위치 아래
+	
+	buttonOK.addActionListener(new ActionListener() {
+		
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		String lb1text = "";
+		if(onion.isSelected()) lb1text += onion.getText();
+		if(cheese.isSelected()) lb1text += cheese.getText();
+		if(tomato.isSelected()) lb1text += tomato.getText();
+		label1.setText("선택한 토핑은 : "+lb1text);
+		}
+	});
+}
+			
+	
+public static void main(String[] args) {
+	
+	new OrderText();
+	}
+}
