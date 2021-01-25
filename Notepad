@@ -1,0 +1,130 @@
+import java.awt.Event;
+import java.awt.FileDialog;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
+
+public class MyNote extends JFrame implements ActionListener {
+	
+	JMenuBar menuBar;
+	JMenu file, edit, color, question, view, hellp;
+	JMenuItem fnew, fopen, fsave, fexit;
+	JMenuItem fblue, fred, fyellow;
+	JMenuItem fileNew1;
+	JTextPane text;
+	JCheckBoxMenuItem cbMenuItem1, cbMenuItem2;
+	String path;
+	
+	MyNote() {
+		
+		
+		makeMenu();
+		
+		setTitle("편집기");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setSize(500, 500);
+		setVisible(true);
+	
+	}
+	
+	
+	//화면 디자인 메뉴 만드는 작업
+	void makeMenu() {
+		
+		text = new JTextPane();
+		//메뉴바 생성
+		menuBar = new JMenuBar();
+		// 메뉴 생성과 단축키 설정 setMnemonic()
+		
+		file = new JMenu("파일(F)");
+		file.setMnemonic('F');
+		file.setMnemonic(KeyEvent.VK_F); // 단축키 Alt + F 설정
+		edit = new JMenu("편집(E)");
+		edit.setMnemonic('E');
+		question = new JMenu("서식(Q)");
+		question.setMnemonic('Q');
+		view = new JMenu("보기(V)");
+		view.setMnemonic('V');
+		hellp = new JMenu("도움말(H)");
+		hellp.setMnemonic('H');
+		//color = new JMenu("색상");
+		
+		
+		// 메뉴 항목 생성과 단축키 설정. setAccelerator()
+		fnew = new JMenuItem("새 파일(N)");
+		fnew.setAccelerator(KeyStroke.getKeyStroke('N', Event.CTRL_MASK));
+		fopen = new JMenuItem("열기(O)");
+		fopen.setAccelerator(KeyStroke.getKeyStroke('O', Event.CTRL_MASK));
+		fsave = new JMenuItem("저장(S)");
+		fsave.setAccelerator(KeyStroke.getKeyStroke('S', Event.CTRL_MASK));
+		fexit = new JMenuItem("끝내기(X)");
+		fexit.setAccelerator(KeyStroke.getKeyStroke('X', Event.CTRL_MASK));
+				
+		//[파일] 메뉴에 메뉴 항목 등록
+		file.add(fnew);
+		file.add(fopen);
+		file.add(fsave);
+		file.add(fexit);
+		
+			
+		//[메뉴바]에 파일,편집,서식,보기,도움말 등록
+		menuBar.add(file);
+		menuBar.add(edit);
+		menuBar.add(question);
+		menuBar.add(view);
+		menuBar.add(hellp);
+		
+		add(text);
+		
+		setJMenuBar(menuBar);
+		
+		fnew.addActionListener(this);
+		fopen.addActionListener(this);
+		fsave.addActionListener(this);
+		fexit.addActionListener(this);
+	}
+		
+	public void actionPerformed(ActionEvent e) {
+		Object o = e.getSource();
+		JDialog jd = new JDialog();
+	
+		if (o == fnew) {
+			path = null;
+			int i = JOptionPane.showConfirmDialog(null, "새로 작성하신 내용을 저장하시겠습니까?", "저장하기",
+					JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+	
+			if (i == 0) { // 예(0) , 아니오(1), 취소(-1)
+				FileDialog dialog = new FileDialog(jd, "저장하기", FileDialog.SAVE);
+				dialog.setFile("*.txt");
+				dialog.setVisible(true);
+				path = dialog.getDirectory() + dialog.getFile();
+			}
+			else if (i == 1) { //아니오
+				text.setText("");
+				this.setTitle("제목없음-메모장");
+				return;
+			}
+			text.setText(null);
+			text.setEditable(true);
+			this.setTitle(path);
+		}
+	}
+	
+			
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		new MyNote();
+	}
+}
+	
