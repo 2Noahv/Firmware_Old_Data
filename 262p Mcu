@@ -1,0 +1,77 @@
+//Atmega128 LCD display program  262p
+#define F_CPU 16000000UL
+#define  RS PD5
+#define  RW PD6
+#define  E PD7
+
+#include <avr/io.h>
+
+void gen_E_strobe(void)
+{	volatile int	i;
+	
+	PORTD |=1<<E;
+	for(i=0; i<10; i++);
+	PORTD &= ~(1<<E);
+}
+
+void wait_BusyFlag(void)
+{	volatile int	i;
+	unsigned char	bf;
+	
+	DDRC = 0x0;
+	PORTD = (PORTD & ~(1<<RS)) | 1<<RW;
+	do{
+		PORTD |= 1<<E;
+		for(i=0; i<10; i++);
+		bf = PINC & 1<<PC7;
+		PORTD &= ~(1<<E);
+	}while( bf );
+}
+	
+
+	void LCD_command(unsigned char data)
+	{	wait_BusyFlag();
+		DDRC = 0xFF;
+		PORTC = data;
+		PORTD &= ~(1<<RS | 1<<RW);
+		gen_E_strobe();
+	}
+	
+	void LCD_data_write(unsigned char data)
+	{	wait_BusyFlag();
+		DDRC = 0xFF;
+		PORTC = data;
+		PORTD = (PORTD | 1<<RS) & ~(1<<RW); 
+		gen_E_strobe();
+	}
+
+	void LCD_init(void)
+	{
+		DDRD |= 1<<RS | 1<<RW | 1<<E;
+		PORTD &= ~(1<<RS | 1<<E | 1<<RW);
+		LCD_command(0x3c);
+		LCD_command(0x02);
+		LCD_command(0x01);
+		LCD_command(0x06);
+		LCD_command(0x0F);
+	}
+	
+char * string[] = {"ATmega128", "Microcontroller"};
+	
+int main(void)
+{	int r, c;
+	
+	LCD_init();
+	
+	for(r=0; r<2; r++) {
+		for(c=0; c<16; c++)
+			if(string[r][c] == '\0') {
+				if( r == 0 )	LCD_command(0xc0);
+				break;
+			}else
+				LCD_data_write( string[r][c]);
+	}
+	
+	while(1);
+	return 0;
+}
