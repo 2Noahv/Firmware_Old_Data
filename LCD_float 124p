@@ -1,0 +1,32 @@
+// LCD_float 124p
+#include	<stdio.h>
+#include	<avr/io.h>
+#include	<util/delay.h>
+#include	"lcd.h"
+
+// 전역변수 선언
+long 	a = 0, b = 0;
+double 	x = 0, y = 0;
+
+int	main(void)
+{	
+	char lcd_string[2][MAX_LCD_STRING];
+
+	LCD_init();
+
+	while(1){
+		a = a + 1;
+		b = b + 2;
+
+		x = x + 0.1;
+		y = y + 0.2;
+														  // %ld long int형 출력 
+		sprintf(lcd_string[0], "A=%-5ld B=%-5ld", a, b);  //10진수 5자리로 왼쪽에 맞춰 출력 
+		LCD_str_write(0, 0, lcd_string[0]);
+
+		sprintf(lcd_string[1], "X=%-5.1f Y=%-5.1f   ", x, y); // 소수점을 포함한 전체 5자리로 
+		LCD_str_write(0, 1, lcd_string[1]);                  // 왼쪽에 맞춰 출력하되, 소수점 이하
+		_delay_ms(500);									//  1자리로 한다.
+	}
+	return 0;
+}
