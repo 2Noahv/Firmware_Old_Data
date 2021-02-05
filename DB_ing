@@ -1,0 +1,121 @@
+package ch03;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
+
+public class DbTest extends JFrame {
+	static ResultSet rs; 	// 실행결과 객체 선언
+	static Statement pstmt;	// SQL명령 전달 위한 객체 선언
+	
+	//Main Table
+	DefaultTableModel dtm;
+	JTable table;
+	JScrollPane Scroll;
+	JLabel label;
+	JPanel panel1, panel2;
+	JButton but,but1,but2,but3;
+	
+	JLabel la_name, la_age, la_job;
+	JTextField tf_name, tf_phone, tf_addr;
+	JButton bt_input, bt_cancel;
+	
+	
+	DbTest () throws SQLException {
+	setTitle("테이블");
+	//테이블 영역에 들어갈 데이터 2차원 배열로 선언 
+	String[] colName = {"이름","등급","나이","직업"};
+	Object[][] data = {};
+	
+	//JPanel 만들어 추가
+	panel1 = new JPanel();
+	label = new JLabel("안녕 테이블~ ^^*");
+	panel1.add(label);
+	add("North",panel1);
+	
+	// 입력폼
+	dtm = new DefaultTableModel(data,colName);
+	table = new JTable(dtm);
+	Scroll = new JScrollPane(table);	//table 객체에 Title 표시 , 테이블 유효 높이 만큼만 표시
+	add("East",Scroll);
+	
+//	JTable table = new JTable(dtm);
+//	JScrollPane spanel = new JScrollPane(table);	//table 객체에 Title 표시 , 테이블 유효 높이 만큼만 표시
+////	table.setAutoCreateRowSorter(true);
+
+	//JPanle 만들어 추가
+	
+	this.add(Scroll);
+	
+	this.setVisible(true);
+	this.setSize(500, 500);
+	this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	
+	
+	
+	DataB.open();
+	select();
+	DataB.close();
+	}
+
+	public static void main(String[] args) throws SQLException {
+		// TODO Auto-generated method stub
+		new DbTest();
+	}
+	public void select() {
+		int i =0;
+		String sql = "select * from costomer ";	//SQL 명령 (테이블의 모듈 필드)
+		try {
+			pstmt = DataB.conn.prepareStatement(sql);
+			rs = pstmt.executeQuery(sql);
+			
+			rs.next();
+			do {
+				String name = rs.getString("cname");
+				String grade = rs.getString("grade");
+				String age = rs.getString("age");
+				String job = rs.getString("job");
+				Object[] rowData = {name, grade, age,job};
+				dtm.addRow(rowData);	//
+				
+			} while (rs.next());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	void initTF() {
+		tf_name.
+	}
+	
+	
+	public int regist() {
+		
+		int result = 0;
+		String query = "INSERT INTO friend(name, phone, addr) VALUES(?,?,?)";
+		
+		try {
+			pstmt = DataB.conn.prepareStatement(query);
+			pstmt.setString(1, );
+			result = pstmt.executeUpdate(query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	
+}
+
+
