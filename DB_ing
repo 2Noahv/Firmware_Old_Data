@@ -1,7 +1,8 @@
-
-
 package ch03;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -9,6 +10,7 @@ import java.sql.Statement;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -25,8 +27,8 @@ public class DbTest extends JFrame {
 	JTable table;
 	JScrollPane Scroll;
 	JLabel label;
-	JPanel panel1, panel2;
-	JButton but,but1,but2,but3;
+	JPanel panel1, panel2, panel3;
+	JButton bt_add,bt_del,bt_up,bt_exit;
 	
 	JLabel la_name, la_age, la_job;
 	JTextField tf_name, tf_phone, tf_addr;
@@ -51,29 +53,171 @@ public class DbTest extends JFrame {
 	Scroll = new JScrollPane(table);	//table 객체에 Title 표시 , 테이블 유효 높이 만큼만 표시
 	add("East",Scroll);
 	
-//	JTable table = new JTable(dtm);
-//	JScrollPane spanel = new JScrollPane(table);	//table 객체에 Title 표시 , 테이블 유효 높이 만큼만 표시
-////	table.setAutoCreateRowSorter(true);
-
-	//JPanle 만들어 추가
+	//JPanel 만들어 추가
+	bt_del = new  JButton("삭제");
+	bt_exit = new JButton("종료");
+	panel2 = new JPanel();
+	panel2.add(bt_del);
+	panel2.add(bt_exit);
+	add("South",panel2); // 프레임에 추가 DOWN
+	
+	//이벤트는 테이블에서만 발생
+	table.addMouseListener(new MyEvent()); //테이블 셀 마우스 클릭 이벤트
+	
+	bt_del.addActionListener(new mainListner());
+	bt_exit.addActionListener(new mainListner());
+	
+	setBounds(400,300,700,700) ;; 프레임 위치, 크기
 	
 	this.add(Scroll);
 	
 	this.setVisible(true);
-	this.setSize(500, 500);
+	
 	this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	
-	
-	
+
 	DataB.open();
 	select();
 	DataB.close();
 	}
-
-	public static void main(String[] args) throws SQLException {
-		// TODO Auto-generated method stub
-		new DbTest();
+	
+	// 생성자
+	void InputForm() {
+		// ScrollPane에  Panel 추가 후 가운데
+		panel3 = new JPanel();
+		panel3.setLayout(null);
+		JScrollPane scrollin = new JScrollPane(panel3);
+		
+		la_name = new JLabel("이름");
+		la_age = new JLabel("전화");
+		la_job = new JLabel("주소");
+		
+		tf_name = new JTextField();
+		tf_phone = new JTextField();
+		tf_addr = new JTextField();
+		
+		bt_input = new JButton("추가");
+		bt_cancel =new JButton("취소");
+		
+		la_name.setBounds(30, 30, 30, 30);
+		la_age.setBounds(30, 80, 30, 30);
+		la_job.setBounds(30, 130, 60, 30);
+		
+		tf_name.setBounds(80, 30, 80, 30);
+		tf_phone.setBounds(80, 80, 80, 30);
+		tf_addr.setBounds(80, 130, 80, 30);
+		
+		bt_input.setBounds(30, 190, 60, 30);
+		bt_cancel.setBounds(100, 190, 60, 30);
+		
+		bt_input.addActionListener(new mainListner());
+		bt_cancel.addActionListener(new mainListner());
+		
+		panel3.add(la_name);
+		panel3.add(la_age);
+		panel3.add(la_job);
+		
+		panel3.add(tf_name);
+		panel3.add(tf_phone);
+		panel3.add(tf_addr);
+		
+		panel3.add(bt_input);
+		panel3.add(bt_cancel);
+		
+		add("Center",scrollin);
 	}
+	
+	class mainListner implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Object ob = e.getSource(); // 객체 이름 변환 ob 저장
+			if(ob==bt_input){ // 입력폼의 [입력]
+				String name = tf_name.getText();
+				String age = tf_phone.getText();
+				String job = tf_addr.getText();
+				if(name == null || name.length() == 0) { // 이름 입력 안됐을 때 아래 메시지 대화상자 표시
+					//name변수에 null값이 들어올 가능성이 단 1%라도 있다면
+					//null에 대한 체크를 하는 데 반드시 앞에서 체크해야 함.
+					
+					JOptionPane.showMessageDialog(null, "이름입력!!");
+					tf_name.requestFocus(); //포커스 이동
+					return ;
+				}
+				if(age.length()==0 ) { // 나이 입력 안됐을 때
+					//TextFiled에는 null값이 들어오지 않으므로 null체크 뺌.
+					JOptionPane.showMessageDialog(null, "직업입력!!");
+					tf_addr.requestFocus(); //포커스 이동
+					return;
+				}
+				if(!modify) { // 추가이면
+					Object rowData[] = {name, age, job}; // 배열에 저장
+					dtm.addRow(rowData); // 모델 테이블 마지막 행에 추가
+					regist();
+					initTF(); // 입력폼 호출
+				} else {
+					dtm.setValueAt(name, srow, 0);
+					dtm.setValueAt(age, srow, 1);
+					dtm.setValueAt(job, srow, 2);
+					initTF();
+				}
+			} else if(ob==bt_cancel) { // 입력폼의 취소
+				initTF();
+			}
+			
+			if(ob==bt_del) { // 폼의 삭제
+				String delName = JOptionPane.showInputDialog(null, "삭제할 이름:");
+				if(delName == null) return ; //취소,x
+				
+				if(delName.length()==0) { // 입력이 없다면
+					JOptionPane.showMessageDialog(null, "삭제할이름입력!!");
+					return;
+				}
+				for(int i=0; i<table.getRowCount(); i++) {
+					if(delName.equals(table.getValueAt(i, 0))) {
+						dtm.removeRow(i);
+						initTF();
+					}
+				}
+			} else if(ob==bt_exit) { // 종료
+				System.exit(0);
+			}
+			modify=false;
+		}
+		
+	}
+	
+	class MyEvent extends MouseAdapter {
+		public void mouseClicked(MouseEven e) {
+			srow = table.getSelectedRow();
+			modify = true;
+			String name=table.getValueAt(srow, 0).toString();
+			String age=table.getValueAt(srow, 1).toString();
+			String job=table.getValueAt(srow, 2).toString();
+			
+			tf_name.setText(name);
+			tf_phone.setText(age);
+			tf_addr.setText(job);
+			
+			bt_input.setText("수정");
+		}
+	}
+	
+	// 폼 초기화
+	void initTF() {
+		tf_name.setEditable(true);
+		tf_name.setText("");
+		tf_phone.setText("");
+		tf_addr.setText("");
+		bt_input.setText("추가");
+		modify = false;
+		tf_name.requestFocus();
+	}
+	
+//	public void DBConnect() {
+//		connector = new DBconn();
+//	}
+
+	
 	public void select() {
 		int i =0;
 		String sql = "select * from costomer ";	//SQL 명령 (테이블의 모듈 필드)
@@ -97,172 +241,28 @@ public class DbTest extends JFrame {
 	}
 	
 	
-	void initTF() {
-		tf_name.
-	}
 	
 	
-	public int regist() {
+	public int regist() { // 입력
 		
 		int result = 0;
 		String query = "INSERT INTO friend(name, phone, addr) VALUES(?,?,?)";
 		
 		try {
 			pstmt = DataB.conn.prepareStatement(query);
-			pstmt.setString(1, );
+			pstmt.setString(1, tf_name.getText());
+			pstmt.setString(2, tf_phone.getText());
+			pstmt.setString(3, tf_addr.getText());
 			result = pstmt.executeUpdate(query);
+		
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return result;
 	}
 	
-	
-}
-
-
-// DB에 넣어야 할 자료
-package ch02;
-
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
-
-public class JTabelTest extends JFrame {
-		
-		DefaultTableModel dtm;
-		JTable table;
-		JScrollPane Scroll;
-		JLabel label;
-		JPanel panel1, panel2;
-		JButton but,but1,but2,but3;
-		
-		
-	public JTabelTest() {
-		
-		panel1 = new JPanel();
-		label = new JLabel("안녕 테이블~ ^^*");
-		panel1.add(label);
-		add(panel1,"North");
-		
-		String[] columnNames = {"이름", "나이", "직업"};
-		Object[][] rowData = { {"홍길동", 13, "학생"},  {"김유신", 15, "화랑"}, {"김덕만", 16, "공주"}};
-		
-		dtm = new DefaultTableModel(rowData,columnNames);
-		table = new JTable(dtm);
-		Scroll = new JScrollPane(table);	//table 객체에 Title 표시 , 테이블 유효 높이 만큼만 표시
-		add("Center",Scroll);
-		
-		
-		panel2 = new JPanel();
-		but = new JButton("추가");
-		but1 = new JButton("삭제");
-		but2 = new JButton("수정");
-		but3 = new JButton("종료");
-		panel2.add(but);
-		panel2.add(but1);
-		panel2.add(but2);
-		panel2.add(but3);
-		add(panel2,"South");
-		
-		MyMouseListener listener = new MyMouseListener();
-		table.addMouseListener(listener);
-		
-		
-		this.setTitle("JTable 테스트");
-		this.setVisible(true);
-		this.setSize(500, 500);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	}
-	
-		
-		 class MyMouseListener implements MouseListener {
-
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				int srow = table.getSelectedRow(); // 선택된 행 인덱스
-				
-				Object name = table.getValueAt(srow, 0);
-				Object age = table.getValueAt(srow, 1);
-				Object job = table.getValueAt(srow, 2);
-				
-				label.setText("이름:" + name + ", 나이:"+  age + ", 직업:" + job);
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
-			
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			 
-		 }
-	
-		 
-
-	
-	
-	
-		public static void main(String[] args) {
-			new JTabelTest();
-		}
-	}
-
-
-
-// open , close 
-package ch03;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-
-public class DataB {
-	public static Connection conn = null;
-	public static void open() throws SQLException {
-		try {	
-			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/store?characterEncoding=UTF-8&serverTimezone=Asia/Seoul", "root", "2943");
-			System.out.println("데이터베이스 연결이 성공했습니다.");
-		}catch (ClassNotFoundException | SQLException e) {
-			System.out.println("데이터베이스 연결이 실패했습니다.");
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-		}
-	}
-	
-	
-
-	public static void close() throws SQLException{
-		conn.close();
+public static void main(String[] args) throws SQLException {
+	// TODO Auto-generated method stub
+	new DbTest();
 	}
 }
-
