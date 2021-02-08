@@ -3,6 +3,8 @@ package ch03;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -30,8 +32,8 @@ public class DbTest extends JFrame {
 	JPanel panel1, panel2, panel3;
 	JButton bt_add,bt_del,bt_up,bt_exit;
 	
-	JLabel la_name, la_age, la_job;
-	JTextField tf_name, tf_phone, tf_addr;
+	JLabel la_name, la_grade, la_age;
+	JTextField tf_name, tf_age, tf_greed;
 	JButton bt_input, bt_cancel;
 	
 	int srow=0;
@@ -40,7 +42,7 @@ public class DbTest extends JFrame {
 	DbTest () throws SQLException {
 	setTitle("테이블");
 	//테이블 영역에 들어갈 데이터 2차원 배열로 선언 
-	String[] colName = {"이름","등급","나이","직업"};
+	String[] colName = {"이름","나이","등급"};
 	Object[][] data = {};
 	
 	//JPanel 만들어 추가
@@ -93,23 +95,24 @@ public class DbTest extends JFrame {
 		JScrollPane scrollin = new JScrollPane(panel3);
 		
 		la_name = new JLabel("이름");
-		la_age = new JLabel("전화");
-		la_job = new JLabel("주소");
+		la_age = new JLabel("나이");
+		la_grade = new JLabel("등급");
+		
 		
 		tf_name = new JTextField();
-		tf_phone = new JTextField();
-		tf_addr = new JTextField();
+		tf_age = new JTextField();
+		tf_greed = new JTextField();
 		
 		bt_input = new JButton("추가");
 		bt_cancel =new JButton("취소");
 		
 		la_name.setBounds(30, 30, 30, 30);
 		la_age.setBounds(30, 80, 30, 30);
-		la_job.setBounds(30, 130, 60, 30);
+		la_grade.setBounds(30, 130, 60, 30);
 		
 		tf_name.setBounds(80, 30, 80, 30);
-		tf_phone.setBounds(80, 80, 80, 30);
-		tf_addr.setBounds(80, 130, 80, 30);
+		tf_age.setBounds(80, 80, 80, 30);
+		tf_greed.setBounds(80, 130, 80, 30);
 		
 		bt_input.setBounds(30, 190, 60, 30);
 		bt_cancel.setBounds(100, 190, 60, 30);
@@ -118,12 +121,12 @@ public class DbTest extends JFrame {
 		bt_cancel.addActionListener(new mainListner());
 		
 		panel3.add(la_name);
+		panel3.add(la_grade);
 		panel3.add(la_age);
-		panel3.add(la_job);
 		
 		panel3.add(tf_name);
-		panel3.add(tf_phone);
-		panel3.add(tf_addr);
+		panel3.add(tf_greed);
+		panel3.add(tf_age);
 		
 		panel3.add(bt_input);
 		panel3.add(bt_cancel);
@@ -138,8 +141,8 @@ public class DbTest extends JFrame {
 			Object ob = e.getSource(); // 객체 이름 변환 ob 저장
 			if(ob==bt_input){ // 입력폼의 [입력]
 				String name = tf_name.getText();
-				String age = tf_phone.getText();
-				String job = tf_addr.getText();
+				String age = tf_age.getText();
+				String grade = tf_greed.getText();
 				if(name == null || name.length() == 0) { // 이름 입력 안됐을 때 아래 메시지 대화상자 표시
 					//name변수에 null값이 들어올 가능성이 단 1%라도 있다면
 					//null에 대한 체크를 하는 데 반드시 앞에서 체크해야 함.
@@ -151,18 +154,18 @@ public class DbTest extends JFrame {
 				if(age.length()==0 ) { // 나이 입력 안됐을 때
 					//TextFiled에는 null값이 들어오지 않으므로 null체크 뺌.
 					JOptionPane.showMessageDialog(null, "직업입력!!");
-					tf_addr.requestFocus(); //포커스 이동
+					tf_greed.requestFocus(); //포커스 이동
 					return;
 				}
 				if(!modify) { // 추가이면
-					Object rowData[] = {name, age, job}; // 배열에 저장
+					Object rowData[] = {name, age, grade}; // 배열에 저장
 					dtm.addRow(rowData); // 모델 테이블 마지막 행에 추가
 					regist();
 					initTF(); // 입력폼 호출
 				} else {
 					dtm.setValueAt(name, srow, 0);
 					dtm.setValueAt(age, srow, 1);
-					dtm.setValueAt(job, srow, 2);
+					dtm.setValueAt(grade, srow, 2);
 					initTF();
 				}
 			} else if(ob==bt_cancel) { // 입력폼의 취소
@@ -192,16 +195,16 @@ public class DbTest extends JFrame {
 	}
 	
 	class MyEvent extends MouseAdapter {
-		public void mouseClicked(MouseEven e) {
+		public void mouseClicked(MouseEvent e) {
 			srow = table.getSelectedRow();
 			modify = true;
 			String name=table.getValueAt(srow, 0).toString();
 			String age=table.getValueAt(srow, 1).toString();
-			String job=table.getValueAt(srow, 2).toString();
+			String grade=table.getValueAt(srow, 2).toString();
 			
 			tf_name.setText(name);
-			tf_phone.setText(age);
-			tf_addr.setText(job);
+			tf_age.setText(age);
+			tf_greed.setText(grade);
 			
 			bt_input.setText("수정");
 		}
@@ -211,11 +214,12 @@ public class DbTest extends JFrame {
 	void initTF() {
 		tf_name.setEditable(true);
 		tf_name.setText("");
-		tf_phone.setText("");
-		tf_addr.setText("");
+		tf_age.setText("");
+		tf_greed.setText("");
 		bt_input.setText("추가");
 		modify = false;
 		tf_name.requestFocus();
+		getListAll();
 	}
 	
 //	public void DBConnect() {
@@ -224,7 +228,7 @@ public class DbTest extends JFrame {
 
 	
 	public void select() {
-		int i =0;
+		int i=0;
 		String sql = "select * from costomer ";	//SQL 명령 (테이블의 모듈 필드)
 		try {
 			pstmt = DataB.conn.prepareStatement(sql);
@@ -233,10 +237,10 @@ public class DbTest extends JFrame {
 			rs.next();
 			do {
 				String name = rs.getString("cname");
-				String grade = rs.getString("grade");
 				String age = rs.getString("age");
-				String job = rs.getString("job");
-				Object[] rowData = {name, grade, age,job};
+				String grade = rs.getString("grade");
+				//String job = rs.getString("job");
+				Object[] rowData = {name, age, grade};
 				dtm.addRow(rowData);	//
 				
 			} while (rs.next());
@@ -251,54 +255,44 @@ public class DbTest extends JFrame {
 	public int regist() { // 입력
 		
 		int result = 0;
-		String query = "INSERT INTO friend(name, phone, addr) VALUES(?,?,?)";
+		String query = "INSERT INTO costomer(name, age, grade) VALUES(?,?,?)";
 		
 		try {
 			pstmt = DataB.conn.prepareStatement(query);
-			pstmt.setString(1, tf_name.getText());
-			pstmt.setString(2, tf_phone.getText());
-			pstmt.setString(3, tf_addr.getText());
+			((PreparedStatement) pstmt).setString(1, tf_name.getText());
+			((PreparedStatement) pstmt).setString(2, tf_age.getText());
+			((PreparedStatement) pstmt).setString(3, tf_greed.getText());
+			
 			result = pstmt.executeUpdate(query);
-		
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return result;
 	}
 	
+	public void getListAll() {
+		try {
+			dtm.setRowCount(0);
+			
+			String query = "SELECT * FROM costomer";
+			pstmt=DataB.conn.prepareStatement(query);
+			rs = pstmt.executeQuery(query);
+			
+			while(rs.next()) {
+				String name = rs.getString(1);
+				String age = rs.getString(2);
+				String grade = rs.getString(3);
+				
+				Object[] rowData = {name, age, grade};
+				dtm.addRow(rowData);
+			}
+		}
+		
+	}
+
+	
 public static void main(String[] args) throws SQLException {
 	// TODO Auto-generated method stub
 	new DbTest();
-	}
-}
-
-// open, close
-package ch03;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-
-public class DataB {
-	public static Connection conn = null;
-	public static void open() throws SQLException {
-		try {	
-			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/store?characterEncoding=UTF-8&serverTimezone=Asia/Seoul", "root", "2943");
-			System.out.println("데이터베이스 연결이 성공했습니다.");
-		}catch (ClassNotFoundException | SQLException e) {
-			System.out.println("데이터베이스 연결이 실패했습니다.");
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-		}
-	}
-	
-	
-
-	public static void close() throws SQLException{
-		conn.close();
 	}
 }
