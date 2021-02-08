@@ -34,6 +34,8 @@ public class DbTest extends JFrame {
 	JTextField tf_name, tf_phone, tf_addr;
 	JButton bt_input, bt_cancel;
 	
+	int srow=0;
+	boolean modify=false;
 	
 	DbTest () throws SQLException {
 	setTitle("테이블");
@@ -48,8 +50,11 @@ public class DbTest extends JFrame {
 	add("North",panel1);
 	
 	// 입력폼
+	InputForm();
+	
 	dtm = new DefaultTableModel(data,colName);
 	table = new JTable(dtm);
+	table.setFillsViewportHeight(true);
 	Scroll = new JScrollPane(table);	//table 객체에 Title 표시 , 테이블 유효 높이 만큼만 표시
 	add("East",Scroll);
 	
@@ -67,9 +72,9 @@ public class DbTest extends JFrame {
 	bt_del.addActionListener(new mainListner());
 	bt_exit.addActionListener(new mainListner());
 	
-	setBounds(400,300,700,700) ;; 프레임 위치, 크기
+	setBounds(400,300,700,700) ;; //프레임 위치, 크기
 	
-	this.add(Scroll);
+	//this.add(Scroll);
 	
 	this.setVisible(true);
 	
@@ -264,5 +269,36 @@ public class DbTest extends JFrame {
 public static void main(String[] args) throws SQLException {
 	// TODO Auto-generated method stub
 	new DbTest();
+	}
+}
+
+// open, close
+package ch03;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+
+public class DataB {
+	public static Connection conn = null;
+	public static void open() throws SQLException {
+		try {	
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/store?characterEncoding=UTF-8&serverTimezone=Asia/Seoul", "root", "2943");
+			System.out.println("데이터베이스 연결이 성공했습니다.");
+		}catch (ClassNotFoundException | SQLException e) {
+			System.out.println("데이터베이스 연결이 실패했습니다.");
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+	}
+	
+	
+
+	public static void close() throws SQLException{
+		conn.close();
 	}
 }
