@@ -1,0 +1,112 @@
+package ch04;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Panel;
+
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+
+public class DBtest extends JFrame {
+	
+	//선언부
+	JPanel Npanel, Cpanel, Spanel;	// 위쪽, 센터, 아래쪽 패널 선언
+	JLabel Subject, name, age, gender, addr, phone, email, idx;	// 제목,이름,나이,주소,연락처,이메일,인덱스 라벨 선언
+	JLabel email_1, phone_1,phone_2;	// @ , - 표시할 라벨 선언
+	JTextField tname, tage, taddr, tphone, temail;
+	JComboBox Cbemail;
+	JRadioButton man,woman;
+	 
+	DBtest() {
+		
+		setTitle("자바 주소록 관리 프로그램");
+		setVisible(true);
+		setBounds(700,80,630,630);	// 프레임 위치 설정
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	//JFrame 상속시 필수 Window 완전히 꺼줌
+		getContentPane().setLayout(null );
+			
+		inputForm();
+	 }
+	 
+	 void inputForm() {		//생성자
+		
+		setLayout(new BorderLayout());
+		Npanel = new JPanel();
+		Npanel.setBackground(Color.black);
+		Npanel.setBounds(0, 0, 630, 40);
+		
+		Subject = new JLabel("영진직업전문학교 주소록관리 프로그램");
+		Subject.setForeground(Color.WHITE);
+		Subject.setFont(new Font("Dialog", Font.PLAIN, 25));
+
+		Npanel.add(Subject);
+		add("North",Npanel); 
+		
+		Cpanel = new JPanel();
+		Cpanel.setLayout(null);;
+		
+		name = new JLabel("이름");
+		age = new JLabel("나이");
+		gender = new JLabel("성별");
+		addr = new JLabel("주소");
+		phone = new JLabel("연락처");
+		email = new JLabel("이메일");
+		idx = new JLabel("INDEX");
+		email_1 = new JLabel("@");
+		phone_1 = new JLabel("-");
+		phone_2 = new JLabel("-");
+		
+		tname = new JTextField(20);
+		 
+		name.setBounds(30,40,200,25);
+		age.setBounds(240,40,200,25);
+		gender.setBounds(400,40,200,25);
+		addr.setBounds(30,80,200,50);
+		phone.setBounds(25, 140, 100, 25);
+		phone_1.setBounds(220,140,500,30);
+		phone_2.setBounds(400,140,500,30);
+		email.setBounds(30, 190, 150, 25);
+		email_1.setBounds(220,190,150,25);
+		// Cbemail.setBounds(440,190,150,25);
+			
+		tname.setBounds(70, 40, 150, 30);
+//		tage.setBounds(280, 40, 100, 30);
+//		man.setBounds(440, 40, 60, 25);
+//		woman.setBounds(500, 40, 60, 25);
+//		taddr.setBounds(70, 90, 480, 30);
+//		tphone.setBounds(70, 140, 120, 30);
+//		tphone.setBounds(250, 140, 120, 30);
+//		tphone.setBounds(430, 140, 120, 30);
+//		temail.setBounds(70, 190, 120, 30);
+//		temail.setBounds(250, 190, 180, 30);
+//			
+//		Cbemail.addItem("직접입력");
+//		Cbemail.addItem("naver.com");
+//		Cbemail.addItem("daum.net");
+//		Cbemail.addItem("gmail.com");
+//		Cbemail.addItem("nate.com");
+		 
+		Cpanel.add(name);
+		Cpanel.add(tname);
+		
+		add("Center",Cpanel);
+		
+			
+	 			
+				
+	}
+
+		
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		new  DBtest ();
+	}
+
+}
