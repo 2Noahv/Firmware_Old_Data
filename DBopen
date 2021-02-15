@@ -1,0 +1,20 @@
+package ch03;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class DBopen {
+	Connection connection;
+	DBopen(){
+		try {
+			
+			Class.forName("com.mysql.cj.jdbc.Driver"); //cj쓰면 빨간색 오류 안뜸.
+			System.out.println("연결성공");			
+			connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/project_member?serverTimezone=Asia/Seoul","root","2943");
+			System.out.println("db 연결성공");			
+
+		} catch(SQLException |ClassNotFoundException ee) { }
+		
+	}
+}
