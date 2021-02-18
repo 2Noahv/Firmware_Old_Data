@@ -1,0 +1,245 @@
+package ch04;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
+public class DBtest extends JFrame {
+	
+	//선언부
+	JPanel Npanel, Cpanel, Cp, Sc, Spanel;	// 위쪽, 센터, 아래쪽 패널 선언
+	JLabel Subject, name, age, gender, addr,phone, email, idx;	// 제목,이름,나이,주소,연락처,이메일,인덱스 라벨 선언
+	JLabel email_1, phone_1,phone_2;	// @ , - 표시할 라벨 선언
+	JTextField tname, tage, taddr, tphone_1,tphone_2,tphone_3, temail_1,temail_2;
+	JTextField tcp_1;
+	JComboBox Cbemail, Search;
+	JRadioButton man,woman;
+	JButton iq, all, ipbut,crybut,delbut,exebut ;
+	JScrollPane scroll;
+	DefaultTableModel dtm;
+	JTable table;
+	PreparedStatement pstmt;
+	ResultSet rs;
+	DBtest dbopen;
+	
+	
+	java.sql.Connection conn;
+	Statement stmt;
+	
+	DBtest() {
+		
+		setTitle("자바 주소록 관리 프로그램");
+		setVisible(true);
+		setBounds(700,80,630,630);	// 프레임 위치 설정
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	//JFrame 상속시 필수 Window 완전히 꺼줌
+		getContentPane().setLayout(null );
+			
+		inputForm();
+		DBopen();
+		query();
+	 }
+	 
+	void DBopen() { 
+		dbopen = new DBtest();	// DB정의
+	}
+	
+	 void inputForm() {		//생성자
+		
+		getContentPane().setLayout(null);
+		Npanel = new JPanel();
+		Npanel.setBackground(Color.black);
+		Npanel.setBounds(0, 0, 630, 40);
+		getContentPane().add(Npanel);
+		
+		Subject = new JLabel("영진직업전문학교 주소록관리 프로그램");
+		Subject.setForeground(Color.WHITE);
+		Subject.setFont(new Font("Dialog", Font.PLAIN, 25));
+
+		Npanel.add("North",Subject);
+		
+		Cpanel = new JPanel(); 				//센터 패널
+		Cpanel.setLayout(null);
+			
+		name = new JLabel("이름");
+		age = new JLabel("나이");
+		gender = new JLabel("성별");
+		addr = new JLabel("주소");
+		phone = new JLabel("연락처");
+		email = new JLabel("이메일");
+		idx = new JLabel("INDEX");
+		email_1 = new JLabel("@");
+		phone_1 = new JLabel("-");
+		phone_2 = new JLabel("-");
+		
+		tname = new JTextField();
+		tage = new JTextField();
+		taddr = new JTextField();
+		tphone_1 = new JTextField();
+		tphone_2 = new JTextField();
+		tphone_3 = new JTextField();
+		temail_1 = new JTextField();
+		temail_2 = new JTextField();
+		
+		
+		
+		man = new JRadioButton("남자");
+		woman = new JRadioButton("여자");
+		
+		Cbemail = new JComboBox();
+
+		name.setBounds(30,70,40,25);
+		age.setBounds(215,70,40,25);
+		gender.setBounds(400,70,35,25);
+		addr.setBounds(30,105,40,20);
+		phone.setBounds(25, 135, 40, 25);
+		phone_1.setBounds(220,140,500,30);
+		phone_2.setBounds(400,140,500,30);
+		email.setBounds(25, 165, 40, 25);
+		email_1.setBounds(220,165,150,25);
+		
+		
+		tname.setBounds(70, 70, 125, 20);
+		tage.setBounds(260, 70, 100, 20);
+		man.setBounds(440, 70, 60, 20);
+		woman.setBounds(500, 70, 60, 20);
+		taddr.setBounds(70, 105, 485, 20);
+		tphone_1.setBounds(70, 138, 110, 20);
+		tphone_2.setBounds(250, 140, 120, 20);
+		tphone_3.setBounds(430, 140, 120, 20);
+		temail_1.setBounds(70, 170, 110, 20);
+		temail_2.setBounds(250, 170, 160, 20);
+		Cbemail.setBounds(440,170,100,20);
+		
+		
+		getContentPane().add(name);
+		getContentPane().add(age);
+		getContentPane().add(gender);
+		getContentPane().add(addr);
+		getContentPane().add(phone);
+		getContentPane().add(phone_1);
+		getContentPane().add(phone_2);
+		getContentPane().add(email);
+		getContentPane().add(email_1);
+		
+		getContentPane().add(tname);
+		getContentPane().add(tage);
+		getContentPane().add(man);
+		getContentPane().add(woman);
+		getContentPane().add(taddr);
+		getContentPane().add(tphone_1);
+		getContentPane().add(tphone_2);
+		getContentPane().add(tphone_3);
+		getContentPane().add(temail_1);
+		getContentPane().add(temail_2);
+		getContentPane().add(Cbemail);
+		
+		
+		Cbemail.addItem("직접입력");
+		Cbemail.addItem("naver.com");
+		Cbemail.addItem("daum.net");
+		Cbemail.addItem("gmail.com");
+		Cbemail.addItem("nate.com");
+		 				
+		Cp = new JPanel();
+		Cp.setBackground(Color.BLUE);	//파란박스
+		Cp.setBounds(0, 210, 630, 50);
+		getContentPane().add(Cp);
+		Cp.setLayout(null);
+		
+		Search = new JComboBox();
+		tcp_1 = new JTextField();
+		iq = new JButton("조회");
+		all = new JButton("전원조회");
+		
+		Search.setBounds(25, 15, 200, 20);
+		tcp_1.setBounds(260,15,125,20);
+		iq.setBounds(420, 15, 60, 20);
+		all.setBounds(500, 15, 100, 20);
+		
+		Search.addItem("검색할카테고리를 선택해주세요");
+		Search.addItem("이름");
+		Search.addItem("나이");
+		Search.addItem("성별");
+		Search.addItem("주소");
+		Search.addItem("연락처");
+		Search.addItem("이메일");
+		Search.addItem("IDX");
+		
+		Cp.add(Search);
+		Cp.add(tcp_1);
+		Cp.add(iq);
+		Cp.add(all);
+		
+		String[] colName = {"이름","나이","성별","주소","연락처","이메일","INDEX"};
+		Object[][] data = {};
+		
+		dtm = new DefaultTableModel(data, colName);
+		table = new JTable(dtm);
+		scroll = new JScrollPane(table);
+		
+		Sc = new JPanel();
+		Sc.setBounds(0, 270, 614, 170);
+		getContentPane().add(scroll);
+		
+		
+		
+		Spanel = new JPanel();		// 입력 버튼 4개
+		Spanel.setBounds(0, 503, 614, 50);
+		getContentPane().add(Spanel);
+	
+		ipbut = new JButton("입력");
+		crybut = new JButton("수정");
+		delbut = new JButton("삭제");
+		exebut = new JButton("종료");
+		
+		Spanel.add(ipbut);
+		Spanel.add(crybut);
+		Spanel.add(delbut);
+		Spanel.add(exebut);
+	}
+
+	 void query() {
+			dtm.setRowCount(0);
+			
+			String sql = "SELECT * FROM `1234`.member";
+			//String sql = "SELECT * FROM project_member.member";
+			
+			try {
+				pstmt = dbopen.connection.prepareStatement(sql);
+				rs = pstmt.executeQuery();
+				
+				while(rs.next()) {
+					String name = rs.getString("name");
+					String age = rs.getString("age");
+					String gender = rs.getString("gender");
+					String addr = rs.getString("addr");
+					String phone = rs.getString("phone");
+					String emaill = rs.getString("emaill");
+					int idx = rs.getInt("idx");
+					Object[] rowData = {name,age,gender,addr,phone,emaill,idx};
+					dtm.addRow(rowData);
+					
+				}
+			}catch(SQLException e) {}
+	 }
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		new  DBtest();
+	}
+
+}
