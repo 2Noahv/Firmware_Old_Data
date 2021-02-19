@@ -1,7 +1,9 @@
-package ch04;
+package ch03;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,27 +36,82 @@ public class DBtest extends JFrame {
 	JTable table;
 	PreparedStatement pstmt;
 	ResultSet rs;
-	DBtest dbopen;
+	DBopen dbopen;
 	
 	
-	java.sql.Connection conn;
-	Statement stmt;
+	static java.sql.Connection conn;
+	static Statement stmt;
 	
 	DBtest() {
 		
 		setTitle("자바 주소록 관리 프로그램");
 		setVisible(true);
-		setBounds(700,80,630,630);	// 프레임 위치 설정
+		setBounds(700,80,645,645);	// 프레임 위치 설정
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	//JFrame 상속시 필수 Window 완전히 꺼줌
 		getContentPane().setLayout(null );
+		
+		String[] colName = {"이름","나이","성별","주소","연락처","이메일","INDEX"};
+		Object[][] data = {};
+		
+		dtm = new DefaultTableModel(data, colName);
+		table = new JTable(dtm);
+		scroll = new JScrollPane(table);
+		
+		table.addMouseListener(new MouseListener() {
 			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int selRow = table.getSelectedRow();	// 테이블의 행 값
+				tname.setText((String) table.getValueAt(selRow, 0)); // 이름 필드 JTexfild, setText은 tname string은 table로 받은 걸 변한하는 의미
+				tage.setText((String) table.getValueAt(selRow, 1));
+				gender.setText((String) table.getValueAt(selRow, 2));
+				taddr.setText((String) table.getValueAt(selRow, 3));
+			
+			}
+			});
+			
+				
+		//	if() {
+			//	man.setSelected(true);
+			//	woman.setSelected(false);
+			//}else {
+				
+			//}
+			
+	
 		inputForm();
-		DBopen();
+		DB_open();
 		query();
 	 }
+	
+	
 	 
-	void DBopen() { 
-		dbopen = new DBtest();	// DB정의
+	void DB_open() { 
+		dbopen = new DBopen();	// DB정의
 	}
 	
 	 void inputForm() {		//생성자
@@ -106,8 +163,8 @@ public class DBtest extends JFrame {
 		gender.setBounds(400,70,35,25);
 		addr.setBounds(30,105,40,20);
 		phone.setBounds(25, 135, 40, 25);
-		phone_1.setBounds(220,140,500,30);
-		phone_2.setBounds(400,140,500,30);
+		phone_1.setBounds(220,135,500,30);
+		phone_2.setBounds(400,135,500,30);
 		email.setBounds(25, 165, 40, 25);
 		email_1.setBounds(220,165,150,25);
 		
@@ -184,22 +241,17 @@ public class DBtest extends JFrame {
 		Cp.add(iq);
 		Cp.add(all);
 		
-		String[] colName = {"이름","나이","성별","주소","연락처","이메일","INDEX"};
-		Object[][] data = {};
-		
-		dtm = new DefaultTableModel(data, colName);
-		table = new JTable(dtm);
-		scroll = new JScrollPane(table);
 		
 		Sc = new JPanel();
-		Sc.setBounds(0, 270, 614, 170);
+		scroll.setBounds(0, 260, 630, 250);
 		getContentPane().add(scroll);
 		
 		
-		
+
 		Spanel = new JPanel();		// 입력 버튼 4개
-		Spanel.setBounds(0, 503, 614, 50);
+		Spanel.setBounds(0, 540, 614, 50);
 		getContentPane().add(Spanel);
+		
 	
 		ipbut = new JButton("입력");
 		crybut = new JButton("수정");
@@ -215,8 +267,8 @@ public class DBtest extends JFrame {
 	 void query() {
 			dtm.setRowCount(0);
 			
-			String sql = "SELECT * FROM `1234`.member";
-			//String sql = "SELECT * FROM project_member.member";
+			//String sql = "SELECT * FROM `1234`.member";
+			String sql = "SELECT * FROM project_member.member";
 			
 			try {
 				pstmt = dbopen.connection.prepareStatement(sql);
@@ -228,18 +280,20 @@ public class DBtest extends JFrame {
 					String gender = rs.getString("gender");
 					String addr = rs.getString("addr");
 					String phone = rs.getString("phone");
-					String emaill = rs.getString("emaill");
-					int idx = rs.getInt("idx");
+					String emaill = rs.getString("email");
+					int idx = rs.getInt("IDX");
 					Object[] rowData = {name,age,gender,addr,phone,emaill,idx};
 					dtm.addRow(rowData);
 					
 				}
 			}catch(SQLException e) {}
 	 }
-
+	 
+	 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		new  DBtest();
+		
 	}
 
 }
