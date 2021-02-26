@@ -32,4 +32,4 @@ int main(void) {					// DDRB = 0xff; // 아두이노 작동 확인용
 	return 0;
 }
 
-//-C "C:\avrdude\avrdude.conf" -p atmega328p -c arduino -P COM15 -b 115200 -U flash:w:"$(ProjectDir)Debug\$(TargetName
+//-C "C:\avrdude\avrdude.conf" -p atmega328p -c arduino -P COM15 -b 115200 -U flash:w:"$(ProjectDir)Debug\$(TargetName).hex":i
