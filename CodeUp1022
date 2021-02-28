@@ -3,7 +3,8 @@
 int main(void)
 {
 	char a[2001];
-	fgets(a, 2000, stdin);
+	fgets(a, 2000, stdin);	// fgets를 이용해서 a라는 배열안에 2000자까지
+				// 기본적인 사용자가 입력한 값을 받겠다는 의미
 	printf("%s",a);
 	return 0;
 }
