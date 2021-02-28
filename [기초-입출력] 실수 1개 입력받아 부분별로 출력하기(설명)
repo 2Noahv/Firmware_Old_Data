@@ -1,0 +1,9 @@
+#include <stdio.h>
+
+int main(void)
+{
+	int a, b;
+	scanf("%d.%d", &a, &b); // int를 입력받아 소수처럼 보이게, 문제의 문법 이해할 것 
+	printf("%d\n%d",a,b);
+	return 0;
+}
