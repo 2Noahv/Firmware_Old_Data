@@ -1,3 +1,5 @@
+// 아두이노를 아트멜로 변환하고 버튼활용해서 밝기 조절하기
+
 #define F_CPU 16000000UL
 #include <avr/io.h>
 #include <util/delay.h>
@@ -5,31 +7,37 @@
 #define PB2 2
 #define PB3 3
 
-int main(void) {					// DDRB = 0xff; // 아두이노 작동 확인용
+	int main(void) {					
+		//DDRD = 0xff;					//	아두이노 작동 확인용
 
-	DDRD = 1<<PD3;					//	출력으로 PD3 출력(OC2B)
-	PORTB = 1<<PB2 | 1<<PB3;		//	내부 풀업저항 설정
+		DDRD = 1<<PD3;					//	출력으로 PD3 출력(OC2B)
+		PORTB = 1<<PB2 | 1<<PB3;		//	내부 풀업저항 설정
 
-	TCCR2A |= 1<<WGM21 | 1<<WGM20;	// 0,1,1 Fast PWM
-	TCCR2A |= 1<<COM2B1;			//Clear OC2B on Compare Match, set OC2B at BOTTOM(non-inverting mode)
-									//OC2B가 작동중에 비교일치 될 때 0으로 set
-	TCCR2B |= 1<<CS22 | 1<<CS21;	//8bit라서 TCCR2A랑 나눠서 사용함, 256분주비 설정
-	OCR2B = 0;
-	
-
-	while (1)
-	{
-		if (PINB & (1<<PB2)){
-			_delay_ms(100);
-			(OCR2B==255) ? OCR2B=255 : OCR2B++;
-		}
+		TCCR2A |= 1<<WGM21 | 1<<WGM20;	// 0,1,1 Fast PWM
+		TCCR2A |= 1<<COM2B1;			//Clear OC2B on Compare Match, set OC2B at BOTTOM(non-inverting mode)
+										//OC2B가 작동중에 비교일치 될 때 0으로 set
+		TCCR2B |= 1<<CS22 | 1<<CS21;	//8bit라서 TCCR2A랑 나눠서 사용함, 256분주비 설정
+		OCR2B = 0;
 		
-		if (PINB & (1<<PB3)){
-			_delay_ms(100);
-			(OCR2B==0) ? OCR2B=0 : OCR2B--;
+
+		while (1)
+		{
+			//PORTD = 0xff;
+			//_delay_ms(1000);
+			//PORTD = 0x00;
+			//_delay_ms(1000);
+			
+			if (PINB & (1<<PB2)){
+				_delay_ms(100);
+				(OCR2B==255) ? OCR2B=255 : OCR2B++;
+			}
+			
+			if (PINB & (1<<PB3)){
+				_delay_ms(100);
+				(OCR2B==0) ? OCR2B=0 : OCR2B--;
+			}
 		}
+		return 0;
 	}
-	return 0;
-}
 
 //-C "C:\avrdude\avrdude.conf" -p atmega328p -c arduino -P COM15 -b 115200 -U flash:w:"$(ProjectDir)Debug\$(TargetName).hex":i
