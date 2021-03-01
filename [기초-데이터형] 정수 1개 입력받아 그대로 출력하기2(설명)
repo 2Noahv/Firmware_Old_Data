@@ -3,7 +3,7 @@
 int main(void)
 {
 	unsigned int n;   // 실수를 포함하지 않음
-	scanf("%u",&n);   // unsigned int 사용시 %u
+	scanf("%u",&n);   // unsigned int 사용시 %u(부호없는 10진수 출력)
 	printf("%u",n);
 	return 0;
 }
