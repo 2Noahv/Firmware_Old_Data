@@ -1,0 +1,39 @@
+
+#define F_CPU 16000000UL
+#define LED PB7
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+volatile unsigned long int timer0 = 0;
+
+ISR(TIMER1_OVF_vect){
+	timer0++;	// 약 0.033초 1하나씩 발생
+	
+	if(timer0 % 32 == 0) // 약1초
+		PORTB ^= 1<<LED;
+		
+		// TCNT1 = 63488; // Overflow 발생시 
+		
+		TCNT1H = 0xf8;
+		TCNT1L = 0;
+}
+
+int main(void)
+{
+    DDRB = 1<< LED;
+	
+	TCCR1B = 1<<CS12;	//T= 1/16M * 2048카운터*256(분주) = 약 0.033초
+						// TCNT1 = 63488; 65536 - 63488 = 2048 카운터
+//	TCNT레지스터는 16비트 표현과 8비트 표현 2가지로 구분해서 표현한다.						
+//	TCNT1H = 248;
+	TCNT1H = 0xf8;
+	TCNT1L = 0;
+	
+	TIMSK |= 1<<TOIE1;	// 개별인터럽트 활성화 레지스터
+	sei();
+	
+	
+    while (1); // 무한루프 방지
+    return 0;
+}
+
