@@ -3,7 +3,6 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
-
 #define PRESSED		1
 #define RELEASED	0
 
@@ -37,13 +36,10 @@ int main(void)
 	
 	TCCR1A = 1<<WGM10 | 1<<WGM11;					// 10bit 고속PWM모드 설정
 	TCCR1B = 1<<WGM12;
-	TCCR1B = 1<<CS12;								// 256분주 설정
-	TCCR1A = 1<<COM1A1 | 1<<COM1B1 | 1<<COM1C1;	// 하강일치  
-	TIMSK  = 1<<TOIE1;								// 타이머/카운터1 오버플로 인터럽트 활성화
-	
-	sei();
-
-	OCR1C = 31;
+	TCCR1B |= 1<<CS12;								// 256분주 설정
+	TCCR1A |= 1<<COM1C1;	// 하강일치  
+							
+	OCR1C = 60;
 	
 	before = RELEASED;
 	while(1){
