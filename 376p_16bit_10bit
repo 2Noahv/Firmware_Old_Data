@@ -1,0 +1,86 @@
+#define F_CPU 16000000L
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+
+
+#define PRESSED		1
+#define RELEASED	0
+
+volatile unsigned int number;
+
+unsigned char led[]={0xc0,0xf9,0xa4,0xb0,0x99,0x92,0x82,0xf8,0x80,0x90};
+
+ISR(TIMER2_OVF_vect)  // 1/16MHz * 256 * 1024 = 16[msec]
+{                     // 인터럽트 벡터와 연결된
+	//인터럽트 서비스 루틴이 작성 되어야 한다.
+}
+
+
+int main(void)
+{
+	int before;
+
+	DDRD = 0xFF;   // FND Data 출력포트 설정
+	DDRF = 1<<PF7| 1<<PF6 | 1<<PF5;	// FND 전원 제어 출력포트 설정
+	DDRB = 1<<PB7;	// PB7 핀 출력포트 설정
+	
+
+
+	DDRC = DDRC & ~(1<<PC0|1<<PC1);	// 버튼 입력포트 설정
+	PORTC = 1<<PC0| 1<<PC1;	// 내부풀업저항 설정
+
+	//TCCR2 = 1<<WGM21 | 1<<WGM20 ; // 8비트 고속PWM 설정
+	//TCCR2 |=1<<CS22 | 1<<CS20;	// 1024분주
+	//TCCR2 |=1<<COM01; // 하강일치 PWM 펄스 출력
+	//TIMSK =1<<TOIE2;
+	
+	TCCR1A = 1<<WGM10 | 1<<WGM11;					// 10bit 고속PWM모드 설정
+	TCCR1B = 1<<WGM12;
+	TCCR1B = 1<<CS12;								// 256분주 설정
+	TCCR1A = 1<<COM1A1 | 1<<COM1B1 | 1<<COM1C1;	// 하강일치  
+	TIMSK  = 1<<TOIE1;								// 타이머/카운터1 오버플로 인터럽트 활성화
+	
+	sei();
+
+	OCR1C = 31;
+	
+	before = RELEASED;
+	while(1){
+		PORTF = 0x80;   // 100자리 TR High
+		PORTD = led[number/100];  // 100자리 FND 출력
+		_delay_ms(1);   // 0.001초 delay
+
+		PORTF = 0x40;   // 10자리 TR High
+		PORTD = led[(number%100)/10];  // 10자리 FND 출력
+		_delay_ms(1);   // 0.001초 delay
+
+		PORTF = 0x20;   // 1자리 TR High
+		PORTD = led[(number%100)%10];  // 1자리 FND 출력
+		_delay_ms(1);   // 0.001초 delay
+
+		if(before==RELEASED && !(PINC&1<<PC0)){
+			(OCR1C == 255)? OCR1C=255 : OCR1C++;
+			_delay_ms(100);
+			before = PRESSED;
+		}
+		else if(before==PRESSED && (PINC&1<<PC0)){
+			_delay_ms(100);
+			before = RELEASED;
+		}
+		else if(before==RELEASED && !(PINC&1<<PC1)){
+			OCR1C= (OCR1C == 0)? 0 :OCR1C-1 ;
+			
+			_delay_ms(100);
+			before = PRESSED;
+		}
+		else if(before==PRESSED && (PINC&1<<PC1)){
+			_delay_ms(100);
+			before = RELEASED;
+		}
+		
+		number = OCR1C;
+	}
+
+	return 0;
+}
