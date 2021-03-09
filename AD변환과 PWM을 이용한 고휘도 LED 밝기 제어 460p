@@ -1,0 +1,33 @@
+#define F_CPU 16000000UL
+#define OC1B PB2
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+ISR(ADC_vect)
+{
+	OCR1B = ADC>>2;				//ADC가 원래 10비트니까 8비트로 변환
+}
+
+int main(void)
+{
+   	DDRB = OC1B					// PB2 = OC1B 출력 핀으로 설정
+	
+	TCCR1A = 1<<WGM10;			// 타이머/카운터1 위상정정 pwm 파형 발생모드
+	TCCR1A |= 1<<COM1A1;			//타이머/카운터1 OCR1B와 하강일치 PWM 펄스 출력
+	TCCR1B |= 1<<CS11 | 1<<CS10;		// 타이머/카운터1 프리스케일러 분주비 = 64
+						// 주기 = 2*256(TOP)*64 / 16[MHz] = 2[ms]
+	
+	ADCSRA |= 1<<ADEN | 1<<ADATE |	1<<ADIE | 7; 
+	// ADC활성화
+	// ADC 자동 트리거 활성화
+	// ADC 인터럽트 활성화
+	// 분주비 128 설정  = ADC  클럭 주파수 16Mh / 128 = 125KHz 
+	// ADC클럭주파수는 디지털을 아날로그로 바꾸는 데 걸리는 시간
+
+	sei();
+	
+	ADCSRA |= 1<ADSC   // A/D 변환 시작
+   	 while (1) ;        // 무한루프 방지
+    
+    	return 0;
+}
