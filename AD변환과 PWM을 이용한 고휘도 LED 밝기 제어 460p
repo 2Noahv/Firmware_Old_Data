@@ -25,6 +25,6 @@ int main(void)
 	sei();
 	
 	ADCSRA |= 1<<ADSC;   // A/D 변환 시작
-	while(1);			// 무한루프 방지
+	while(1);	    // 무한루프 방지
 	return 0;
 }
