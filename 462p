@@ -1,0 +1,117 @@
+#include	<avr/io.h>
+#include	<avr/interrupt.h>
+#include	<stdio.h>
+
+#include	"lcd.h"
+// LCD.h 시작
+
+
+
+// LCD.h 끝
+
+#define	MAX_LCD_STRING	0x40
+
+#define	GO_SW		PE7  // ADC 시작 명령 스위치
+#define	MODE_SW	PE5  // 단일/연속 모드 선택 스위치, 1:연속 모드 0:단일 모드
+
+#define	SINGLE_MODE		0
+#define	FREE_MODE		1
+
+#define	PRESSED	 	0
+#define	RELEASED	 	1
+
+volatile int  adc_rq=0, adc_result=0;
+volatile unsigned  int  mode = SINGLE_MODE;
+
+ISR(ADC_vect)
+{	adc_result = ADC;
+	adc_rq = 0;
+}
+
+ISR(INT5_vect)
+{	mode = (PINE & 1<<MODE_SW) ? FREE_MODE : SINGLE_MODE;	}
+
+void ADC_init(void)
+{
+	// ADC 활성화, ADC 인터럽트 활성화, 프리스케일러 CPU 분주비=64
+	ADCSRA |= 1<<ADEN | 1<<ADIE | 7;
+}
+
+// row, col 위치에서 문자열 str을 LCD에 출력한다.
+void	LCD_str_write(unsigned int row, unsigned int col, char *str)
+{
+	int	i;
+	
+	set_cursor(row, col);
+	for(i=0; (i+col < MAX_LCD_STRING) && (str[i] != '\0'); i++)
+	LCD_data_write(str[i]);
+}
+
+enum {MODE_CONFIRM, ADC_START, ADC_DONE} state=MODE_CONFIRM;
+
+//////////////////////////////////////////////////////////////
+int	main(void)
+{
+	unsigned	int	prev_go_sw = 1, now_go_sw = 1;
+	char lcd_string[2][MAX_LCD_STRING];
+	
+	ADC_init();
+	LCD_init();
+	
+	EIMSK |= 1<<MODE_SW;		// MODE_SW 외부핀 인터럽트 활성화
+	EICRB |= 1<<ISC50;		// (0, 1) 비트 값이 토글될 때마다 인터럽트
+	DDRE &= ~(1<<GO_SW | 1<<MODE_SW); // GO_SW, MODE 핀을 입력핀으로 설정
+	PORTE |= 1<<GO_SW | 1<<MODE_SW;	// GO_SW, MODE 핀에 내부 풀업저항 연결
+
+	sprintf(lcd_string[0], "Voltage= ");
+	sprintf(lcd_string[1], "ADC result= ");
+
+	LCD_str_write(0, 0, lcd_string[0]);
+	LCD_str_write(1, 0, lcd_string[1]);
+
+	sei();		// start global interrupt
+	mode = (PINE & 1<<MODE_SW) ? FREE_MODE : SINGLE_MODE; //시작 전 mode 확인
+	
+	while(1){
+		switch( state ){
+			case MODE_CONFIRM:
+			if( mode == FREE_MODE ){
+				ADCSRA |= 1<<ADFR;	// 연속 모드 설정 후
+				adc_rq = 1;
+				ADCSRA |= 1<<ADSC;	// A/D 변환 곧바로 시작
+				state = ADC_DONE;
+				}else{
+				ADCSRA &= ~(1<<ADFR);	// 단일 모드 설정 후
+				state = ADC_START;
+			}
+			break;
+			
+			case ADC_START:
+			if( mode == SINGLE_MODE ){
+				now_go_sw = (PINE & 1<<GO_SW) ? RELEASED : PRESSED;
+				// 스위치가 눌린 순간 감지
+				if( prev_go_sw==RELEASED && now_go_sw==PRESSED){
+					adc_rq = 1;
+					ADCSRA |= 1<<ADSC;	// A/D 변환 시작
+					state = ADC_DONE;
+				}
+				prev_go_sw = now_go_sw;
+				}else{
+				state = MODE_CONFIRM;
+			}
+			break;
+			
+			case ADC_DONE:
+			while(adc_rq);		// ADC가 종료되기를 기다림
+			
+			double volt = ADC * 5 / 1023.;
+			sprintf(lcd_string[0], "%4.2f[V]", volt);
+			sprintf(lcd_string[1], "%-4d ", ADC);
+			LCD_str_write(0, 8, lcd_string[0]);
+			LCD_str_write(1, 12, lcd_string[1]);
+			state = MODE_CONFIRM;
+			break;
+		}
+	}
+	return 0;
+}
