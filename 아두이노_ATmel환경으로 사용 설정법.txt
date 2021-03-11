@@ -1,1 +1,0 @@
--C "C:\avrdude\avrdude.conf" -p atmega328p -c arduino -P COM15 -b 115200 -U flash:w:"$(ProjectDir)Debug\$(TargetName).hex":i
