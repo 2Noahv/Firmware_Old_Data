@@ -1,0 +1,18 @@
+#define F_CPU 16000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+
+int main(void)
+{
+	DDRB = 0xff;    // 아두이노 13pin 깜빡임 test용
+	
+	while (1)
+	{
+		PORTB = 0xFF;
+		_delay_ms(100);
+		PORTB = 0x00;
+		_delay_ms(100);
+	}
+}
+
+// -C "C:\avrdude\avrdude.conf" -p atmega328p -c arduino -P COM3 -b 115200 -U flash:w:"$(ProjectDir)Debug\$(TargetName).hex":i
