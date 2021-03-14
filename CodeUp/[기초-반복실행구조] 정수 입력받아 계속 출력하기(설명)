@@ -1,0 +1,18 @@
+#include <stdio.h>
+
+int main(void) {
+ 
+	int a,b;
+	scanf("%d", &a);
+	replay:           //  : 콜론으로 끝냄 
+	scanf("%d", &b);
+
+	if(a-- != 0) {
+		printf("%d\n",b);
+		goto replay;   // replay로 이동 a의 값 -1 감소
+
+	}
+	
+	return 0;
+}
+
