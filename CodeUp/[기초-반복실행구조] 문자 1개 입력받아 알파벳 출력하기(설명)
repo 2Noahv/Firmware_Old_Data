@@ -1,0 +1,13 @@
+#include <stdio.h>
+
+int main(void) {
+ 
+	char a,i;
+	scanf("%c", &a);
+
+	for(i = 'a'; i <= a; i++){	// 'a' 아스키코드  
+		printf("%c ",i);
+	}	
+	return 0;
+}
+
