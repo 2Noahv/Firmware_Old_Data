@@ -1,0 +1,4 @@
+# Auto detect text files and perforn LF normalization
+# text=auto
+* linguist-vendored
+*.cpp linguist-detectable=false
