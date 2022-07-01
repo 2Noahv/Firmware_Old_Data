@@ -1,4 +1,7 @@
 # Auto detect text files and perforn LF normalization
 # text=auto
 * linguist-vendored
+*.cpp linguist-detectable=true
+*.py linguist-detectable=true
 *.cpp linguist-detectable=false
+*.java linguist-detectable=false
